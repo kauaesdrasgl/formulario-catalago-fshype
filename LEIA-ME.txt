@@ -25,3 +25,5 @@ OBSERVAÇÕES
 - Os nomes dos campos viram colunas na planilha.
 - O serviço de terceiros pode ter limitações, política de dados e condições de uso próprias.
 - Não envie informações confidenciais ou dados de pagamento.
+
+ATUALIZAÇÃO: removida a seção de fotografias. A animação de envio aparece antes do envio nativo para Sheet Monkey. A confirmação real depende da resposta do serviço.

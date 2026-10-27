@@ -5,6 +5,8 @@
   const saveStatus = document.getElementById('saveStatus');
   const submitButton = document.getElementById('submitButton');
   const dialog = document.getElementById('clearDialog');
+  const sendingOverlay = document.getElementById('sendingOverlay');
+  let submitting = false;
   const draftKey = 'fs-hype-product-form-v1';
   const fields = [...form.querySelectorAll('input[name]:not([type="hidden"]), select[name], textarea[name]')];
   const getData = () => Object.fromEntries(fields.map(field => [field.name, field.value]));
@@ -38,24 +40,30 @@
     form.querySelector('[name="Produto"]').focus();
   });
   form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (submitting) return;
     const price = Number(document.getElementById('price').value);
     const sale = document.getElementById('salePrice').value;
     if (sale && Number(sale) >= price) {
-      event.preventDefault();
       setFeedback('O preço promocional deve ser menor que o preço de venda.', true);
       document.getElementById('salePrice').focus();
       return;
     }
     if (!form.checkValidity()) {
-      event.preventDefault();
       form.reportValidity();
       return;
     }
-    // O navegador envia o POST nativo ao Sheet Monkey. A confirmação real
-    // depende da resposta do serviço; não presumimos que houve sucesso.
+    // A animação antecede o POST nativo. Não mostramos sucesso antes da resposta do serviço.
+    submitting = true;
     submitButton.disabled = true;
     submitButton.textContent = 'Enviando…';
-    setFeedback('Enviando ao Sheet Monkey. Aguarde a confirmação do serviço.');
-    setTimeout(() => { submitButton.disabled = false; submitButton.innerHTML = 'Enviar produto <span aria-hidden="true">↗</span>'; }, 10000);
+    setFeedback('Encaminhando informações. Aguarde a resposta do Sheet Monkey.');
+    sendingOverlay.classList.add('active');
+    sendingOverlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-sending');
+    window.setTimeout(() => {
+      // submit() envia ao endpoint definido no HTML sem disparar novamente este listener.
+      HTMLFormElement.prototype.submit.call(form);
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 150 : 1050);
   });
 })();
